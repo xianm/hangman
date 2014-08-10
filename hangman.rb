@@ -16,11 +16,20 @@ class Hangman
 end
 
 class ComputerPlayer
-	def initialize(file_name)
+	DICTIONARY_FILE = "dictionary.txt"
+
+	def initialize(file_name = DICTIONARY_FILE)
 		@dictionary = File.readlines(file_name).map(&:chomp)
 	end
 
 	def pick_word
 		@dictionary.sample
 	end
+end
+
+if __FILE__ == $PROGRAM_NAME
+	guesser = ComputerPlayer.new
+	checker = ComputerPlayer.new
+	game = Hangman.new(guesser, checker)
+	game.play
 end
