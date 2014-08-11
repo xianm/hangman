@@ -1,15 +1,20 @@
 class Hangman
-	def initialize(guesser, checker)
+	MAX_ATTEMPTS = 10
+
+	def initialize(guesser, checker, max_attempts = MAX_ATTEMPTS)
 		@guesser = guesser
 		@checker = checker
+		@max_attempts = max_attempts
 	end
 
 	def play
 		secret_word_length = @checker.pick_secret_word
 		@guesser.receive_secret_word(secret_word_length)
 		@secret_word = Array.new(secret_word_length)
+		
+		@attempts = 0
 
-		while true
+		until game_over?
 			puts "Secret word: #{secret_word}"
 
 			begin
@@ -18,7 +23,13 @@ class Hangman
 			end until self.class.valid_guess?(guess)
 
 			positions = @checker.check_guess(guess)
+
+			@attempts += 1 if positions.empty?
 		end
+	end
+
+	def game_over?
+		@attempts >= @max_attempts
 	end
 
 	def secret_word
