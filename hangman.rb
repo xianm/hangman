@@ -1,5 +1,5 @@
 class Hangman
-  MAX_ATTEMPTS = 10
+  MAX_ATTEMPTS = 6
 
   def initialize(guesser, checker, max_attempts = MAX_ATTEMPTS)
     @guesser = guesser
