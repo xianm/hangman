@@ -38,9 +38,10 @@ class Hangman
       puts "You won, good job!"
     else
       puts "You lost, nice try. "
+      @secret_word = @checker.reveal_secret_word
     end
 
-    print "'#{secret_word}' was my secret word."
+    puts "'#{secret_word}' was my secret word."
   end
 
   def game_over?
@@ -81,6 +82,10 @@ class ComputerPlayer
     @secret_word = Array.new(length)
   end
 
+  def reveal_secret_word
+    @secret_word
+  end
+
   def guess
     guess = ('a'..'z').to_a.sample
     puts guess
@@ -111,6 +116,11 @@ class HumanPlayer
 
   def receive_secret_word(length)
     puts "The word you have to guess is #{length} characters long."
+  end
+
+  def reveal_secret_word
+    # todo: should it prompt for the secret word and add it to the dictionary
+    # if it's not in it?
   end
 
   def guess
