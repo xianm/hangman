@@ -24,6 +24,8 @@ class Hangman
 
       positions = @checker.check_guess(guess)
 
+      @guesser.handle_guess_response(guess, positions)
+
       unless positions.empty?
         positions.each do |i|
           @secret_word[i] = guess
@@ -57,7 +59,7 @@ class Hangman
   end
 
   def secret_word
-    @secret_word.map { |char| char.nil? ? "_" : char }.join(" ")
+    @secret_word.map { |char| char.nil? ? "_" : char }.join
   end
 
   def self.valid_guess?(guess)
@@ -69,6 +71,7 @@ end
 class ComputerPlayer
   def initialize(dictionary = Dictionary.new)
     @dictionary = dictionary
+    @already_guessed = []
   end
 
   def pick_secret_word
@@ -77,7 +80,8 @@ class ComputerPlayer
   end
 
   def receive_secret_word(length)
-    @secret_word = Array.new(length)
+    @secret_word = Array.new(length, '.')
+    @dictionary.filter_by_length(length)
   end
 
   def reveal_secret_word
@@ -85,14 +89,28 @@ class ComputerPlayer
   end
 
   def guess
-    guess = ('a'..'z').to_a.sample
-    puts guess
-    guess
+    possible_letters = @dictionary.letters_by_frequency(@already_guessed)
+    letter = possible_letters.first
+    @already_guessed << letter
+    letter
   end
 
   def check_guess(guess)
     [].tap do |positions|
       @secret_word.each_with_index { |c, i| positions << i if c == guess }
+    end
+  end
+
+  def handle_guess_response(guess, positions)
+    if positions.empty?
+      @dictionary.filter_words_containing(guess)
+    else
+      positions.each do |i|
+        @secret_word[i] = guess
+      end
+
+      exp = @secret_word.join('')
+      @dictionary.filter_by_regexp(exp)
     end
   end
 end
@@ -119,6 +137,7 @@ class HumanPlayer
   def reveal_secret_word
     # todo: should it prompt for the secret word and add it to the dictionary
     # if it's not in it?
+    []
   end
 
   def guess
@@ -153,14 +172,35 @@ class Dictionary
     @words.select! { |el| el.length == length }
   end
 
-  def filter_by_regexp(exp)
+  def filter_by_regexp(exp_str)
+    exp = Regexp.new(exp_str)
     @words.select! { |el| el.match(exp) }
+  end
+
+  def filter_words_containing(letter)
+    @words.select! { |el| !el.include?(letter) }
+  end
+
+  def letters_by_frequency(ignore_letters = [])
+    generate_histogram(ignore_letters).sort_by { |k, v| v }.transpose.first.reverse
+  end
+
+  def generate_histogram(ignore_letters = [])
+    histogram = Hash.new { 0 }
+
+    @words.each do |word|
+      word.each_char do |char|
+        histogram[char] += 1 unless ignore_letters.include?(char)
+      end
+    end
+
+    histogram
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  guesser = HumanPlayer.new
-  checker = ComputerPlayer.new
+  guesser = ComputerPlayer.new
+  checker = HumanPlayer.new
   game = Hangman.new(guesser, checker)
   game.play
 end
