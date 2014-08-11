@@ -33,10 +33,26 @@ class Hangman
         puts "Incorrect, you have #{@max_attempts - @attempts} attempts left!"
       end
     end
+
+    if won?
+      puts "You won, good job!"
+    else
+      puts "You lost, nice try. "
+    end
+
+    print "'#{secret_word}' was my secret word."
   end
 
   def game_over?
-    @attempts >= @max_attempts || @secret_word.none? { |el| el.nil? }
+    won? || lost?
+  end
+
+  def won?
+    @secret_word.none? { |el| el.nil? }
+  end
+
+  def lost?
+    @attempts >= @max_attempts
   end
 
   def secret_word
@@ -113,7 +129,7 @@ class HumanPlayer
 end
 
 if __FILE__ == $PROGRAM_NAME
-  guesser = ComputerPlayer.new
+  guesser = HumanPlayer.new
   checker = ComputerPlayer.new
   game = Hangman.new(guesser, checker)
   game.play
