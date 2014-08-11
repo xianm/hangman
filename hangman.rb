@@ -66,7 +66,9 @@ class ComputerPlayer
   end
 
   def guess
-    ('a'..'z').to_a.sample
+    guess = ('a'..'z').to_a.sample
+    puts guess
+    guess
   end
 
   def check_guess(guess)
