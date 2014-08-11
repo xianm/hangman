@@ -67,10 +67,8 @@ class Hangman
 end
 
 class ComputerPlayer
-  DICTIONARY_FILE = "dictionary.txt"
-
-  def initialize(file_name = DICTIONARY_FILE)
-    @dictionary = File.readlines(file_name).map(&:chomp)
+  def initialize(dictionary = Dictionary.new)
+    @dictionary = dictionary
   end
 
   def pick_secret_word
@@ -135,6 +133,28 @@ class HumanPlayer
       puts "Please use comma seperated values to indicate any occurances. Try again."
       retry
     end
+  end
+end
+
+class Dictionary
+  DICTIONARY_FILE = "dictionary.txt"
+
+  attr_reader :words
+
+  def initialize(file = DICTIONARY_FILE)
+    @words = File.readlines(file).map(&:chomp)
+  end
+
+  def sample
+    @words.sample
+  end
+
+  def filter_by_length(length)
+    @words.select! { |el| el.length == length }
+  end
+
+  def filter_by_regexp(exp)
+    @words.select! { |el| el.match(exp) }
   end
 end
 
