@@ -32,18 +32,18 @@ class Hangman
         end
       else
         @attempts += 1
-        puts "Incorrect, you have #{@max_attempts - @attempts} attempts left!"
+        puts "Incorrect, #{@max_attempts - @attempts} attempts left!"
       end
     end
 
     if won?
-      puts "You won, good job!"
+      puts "Guesser wins!"
     else
-      puts "You lost, nice try. "
+      puts "Guesser loses! "
       @secret_word = @checker.reveal_secret_word
     end
 
-    puts "'#{secret_word}' was my secret word."
+    puts "'#{secret_word}' was the secret word."
   end
 
   def game_over?
@@ -92,6 +92,7 @@ class ComputerPlayer
     possible_letters = @dictionary.letters_by_frequency(@already_guessed)
     letter = possible_letters.first
     @already_guessed << letter
+    puts letter # simulate input in the console
     letter
   end
 
