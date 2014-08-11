@@ -36,7 +36,7 @@ class Hangman
   end
 
   def game_over?
-    @attempts >= @max_attempts && @secret_word.none? { |el| el.nil? }
+    @attempts >= @max_attempts || @secret_word.none? { |el| el.nil? }
   end
 
   def secret_word
@@ -100,14 +100,18 @@ class HumanPlayer
   end
 
   def check_guess(guess)
-    print "Where do any '#{guess}'s occur, if any (comma seperated): "
-    
-    positions = gets.chomp
+    begin
+      print "Where do any '#{guess}'s occur, if any (comma seperated): "
+      positions = gets.chomp.split(",").map { |i| Integer(i) - 1 }
+    rescue ArgumentError
+      puts "Please use comma seperated values to indicate any occurances. Try again."
+      retry
+    end
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  guesser = HumanPlayer.new
+  guesser = ComputerPlayer.new
   checker = ComputerPlayer.new
   game = Hangman.new(guesser, checker)
   game.play
