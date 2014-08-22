@@ -21,7 +21,7 @@ class Dictionary
   end
 
   def filter_words_containing(letter)
-    @words.select! { |el| !el.include?(letter) }
+    @words.reject! { |el| el.include?(letter) }
   end
 
   def letters_by_frequency(ignore_letters = [])
