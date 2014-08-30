@@ -21,7 +21,15 @@ class HumanPlayer
   end
 
   def guess
-    gets.chomp
+    while true
+      print "> "
+      guess = gets.chomp.downcase
+      return guess if valid_guess?(guess)
+    end
+  end
+
+  def valid_guess?(guess)
+    /^[a-z]$/.match(guess)
   end
 
   def check_guess(guess)
@@ -32,5 +40,8 @@ class HumanPlayer
       puts "Please use comma seperated values to indicate any occurances. Try again."
       retry
     end
+  end
+
+  def handle_guess_response(guess, positions)
   end
 end

@@ -24,7 +24,7 @@ class ComputerPlayer
     possible_letters = @dictionary.letters_by_frequency(@already_guessed)
     letter = possible_letters.first
     @already_guessed << letter
-    puts letter # simulate input in the console
+    puts "> #{ letter }" # simulate input in the console
     letter
   end
 

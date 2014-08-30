@@ -18,6 +18,22 @@ class Hangman
     Hangman.new(ComputerPlayer.new, ComputerPlayer.new)
   end
 
+  def self.human_vs_human
+    Hangman.new(HumanPlayer.new, HumanPlayer.new)
+  end
+
+  def self.test_cpu_performance(pool_size = 100)
+    wins = 0
+
+    pool_size.times do
+      wins += 1 if Hangman.cpu_vs_cpu.play
+    end
+
+    win_pct = wins / (pool_size * 1.0) * 100
+
+    puts "#{ wins } / #{ pool_size } win rate (#{ win_pct }%)"
+  end
+
   def play
     secret_word_length = @checker.pick_secret_word
     @guesser.receive_secret_word(secret_word_length)
@@ -28,13 +44,8 @@ class Hangman
     until game_over?
       puts "Secret word: #{secret_word}"
 
-      begin
-        print "> "
-        guess = @guesser.guess
-      end until self.class.valid_guess?(guess)
-
+      guess = @guesser.guess
       positions = @checker.check_guess(guess)
-
       @guesser.handle_guess_response(guess, positions)
 
       unless positions.empty?
@@ -47,14 +58,10 @@ class Hangman
       end
     end
 
-    if won?
-      puts "Guesser wins!"
-    else
-      puts "Guesser loses! "
-      @secret_word = @checker.reveal_secret_word
-    end
+    puts "Guesser #{ won? ? 'wins' : 'loses' }!"
+    puts "'#{ @checker.reveal_secret_word.join }' was the secret word."
 
-    puts "'#{secret_word}' was the secret word."
+    won?
   end
 
   def game_over?
@@ -72,13 +79,8 @@ class Hangman
   def secret_word
     @secret_word.map { |char| char.nil? ? "_" : char }.join
   end
-
-  def self.valid_guess?(guess)
-    guess.strip.length > 0 &&
-    guess.downcase.strip.each_char.all? { |char| char.between?('a', 'z') }
-  end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  Hangman.cpu_vs_cpu.play
+  Hangman.human_vs_cpu.play
 end
